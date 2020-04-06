@@ -1,0 +1,81 @@
+* {
+  box-sizing: border-box;
+  padding: 5px;
+  margin: 5px auto;
+  font-family: arial;
+}
+body {
+  background-color: black;
+}
+select {
+  width: 200px;
+  text-align-last: center;
+  height: 30px;
+  font-size: 14px;
+  border: solid #ffa31a 3px;
+}
+label {
+  text-align: center;
+  display: inline-block;
+}
+input {
+  width: 200px;
+  display: block;
+  border: solid #ffa31a 3px;
+}
+.checkbox {
+  display: inline-block;
+  width: auto;
+}
+#button {
+  margin: 10px auto;
+  height: 35px;
+  width: 165px;
+  font-size: 20px;
+  box-shadow: inset -3px -3px 10px #cc870a;
+  background-color: #ffa31a;
+  color: white;
+  border-radius: 15px;
+  font-style: italic;
+  padding: 0;
+}
+textarea {
+  display: block;
+  resize: none;
+  margin: 10px auto 5px;
+  border: solid #ffa31a 3px;
+}
+h1 {
+  color: white;
+  text-align: center;
+  background-color: #ffa31a;
+  margin: 0 auto;
+  padding: 10px 0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+main {
+  text-align: center;
+  margin: 0 auto;
+  padding: 0;
+  border-radius: 10px;
+  color: white;
+  background-color: #3ca1c3;
+  margin-top: 110px;
+  width: 260px;
+}
+@media only screen and (max-width: 810px) {
+  h1 {
+    margin-top: 125px;
+  }
+  header {
+    width: 70%;
+  }
+}
+.main button i {
+  /*like button icon doesn't disrupt clicking like button*/
+  pointer-events: none;
+}
+a:visited {
+  text-decoration: none !important;
+}

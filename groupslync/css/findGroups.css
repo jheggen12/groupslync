@@ -1,0 +1,101 @@
+* {
+  box-sizing: border-box;
+  padding: 5px;
+  margin: 5px auto;
+  font-family: arial;
+}
+.findGroups {
+  background-color: black;
+  background-size: cover;
+  padding: 0;
+}
+.findGroups main {
+  background-color: #3ca1c3;
+  text-align: center;
+  min-width: 650px;
+  width: 35%;
+  border-radius: 10px;
+  margin: 100px auto;
+  padding: 0;
+}
+.findGroups main p {
+  font-size: 24px;
+}
+select {
+  display: block;
+  margin-bottom: 20px;
+  text-align-last: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 auto;
+  height: 28px;
+}
+input {
+  text-align: center;
+  box-shadow: inset -3px -3px 10px #eee;
+  border-radius: 15px;
+  width: 200px;
+}
+h1 {
+  color: white;
+  text-align: center;
+  background-color: #ffa31a;
+  margin: 0 auto;
+  padding: 10px 0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+td {
+  border-top: 1px solid black;
+  padding: 10px;
+  text-align: center;
+  max-width: 160px;
+  overflow-wrap: break-word;
+}
+tr {
+  min-height: 50px;
+}
+table {
+  border-collapse: collapse;
+}
+#search {
+  margin: 20px 40% 5px;
+  height: 30px;
+  width: 100px;
+  font-size: 20px;
+  box-shadow: inset -3px -3px 10px #cc870a;
+  background-color: #ffa31a;
+  color: white;
+  border-radius: 15px;
+  font-style: italic;
+  padding: 0;
+}
+.fa-times {
+  color: red !important;
+}
+.fa-star {
+  cursor: pointer;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+nav a {
+  color: black !important;
+}
+i:hover {
+  color: gold;
+}
+table a:hover {
+  opacity: 50%;
+}
+a {
+  color: blue;
+}
+a:visited {
+  text-decoration: none !important;
+  color: blue;
+}
+@media only screen and (max-width: 810px) {
+  .findGroups main {
+    margin: 150px auto;
+  }
+}

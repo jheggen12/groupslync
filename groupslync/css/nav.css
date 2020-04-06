@@ -1,0 +1,161 @@
+.currentPage {
+  box-shadow: 3px 3px gray, -3px -3px gray;
+}
+.fa-bell {
+  padding-bottom: 22px;
+  padding-left: 20px;
+  color: red;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+#notifications {
+  background-color: #ffa31a;
+  width: 300px;
+  position: absolute;
+  top: 48px;
+  right: -81px;
+  z-index: 5;
+  list-style-type: none;
+  max-height: 300px;
+  overflow-y: scroll;
+  padding: 0;
+  overflow-wrap: break-word;
+  color: navy;
+  border: solid black 3px;
+  line-height: 20px;
+}
+#notifications a:hover {
+  color: navy !important;
+  opacity: 50%;
+}
+#notifications li {
+  border-top: solid black 3px;
+  padding: 10px;
+  margin: 0;
+  width: 100%;
+}
+#clearNotif {
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+  font-size: 20px;
+  border: none;
+  background-color: #3ca1c3;
+  color: white;
+  font-style: italic;
+  font-weight: bold;
+}
+#clearNotif:hover {
+  color: black;
+}
+nav {
+  position: fixed;
+  background-color: white;
+  top: 0;
+  width: 100%;
+  left: 0;
+  height: 65px;
+  z-index: 5;
+  margin: 0;
+  padding: 0;
+  border-bottom: solid black 2px;
+}
+nav ul .nav-uid ul {
+  position: absolute;
+  text-align: center;
+  margin-top: 0px;
+  background-color: white;
+  margin-right: -25px;
+  right: 0;
+  width: 140px;
+}
+nav ul li ul {
+  display: none;
+}
+nav ul li:hover ul {
+  /*makes logout menu appear*/
+  display: block;
+  background-color: white;
+  padding: 10px;
+}
+nav ul li ul li a {
+  color: navy;
+}
+.nav-uid {
+  float: right;
+  margin: 0;
+}
+nav li {
+  font-weight: 600;
+  font-size: 17px;
+  vertical-align: middle;
+  display: inline-block;
+  position: relative;
+  padding: 0 5px;
+}
+nav .subli {
+  margin-right: 20px !important;
+}
+nav .mainli {
+  margin: 0;
+  padding: 0 5px;
+}
+nav li img {
+  /*spotify button*/
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+}
+#home {
+  vertical-align: super;
+  position: relative;
+  padding-right: 0;
+}
+nav li a {
+  text-decoration: none !important;
+  font-family: arial;
+  display: block;
+  padding: 0 3px;
+  color: navy !important;
+}
+nav li a:hover {
+  color: red !important;
+}
+.fa-bell {
+  margin-top: 10px;
+  margin-right: 10px;
+}
+@media only screen and (max-width: 810px) {
+  nav {
+    height: 120px;
+  }
+  nav .mainli {
+    margin: 5px 30px;
+  }
+  .nav-uid {
+    float: right;
+    text-align: center;
+  }
+  #notifications {
+    top: 43px;
+    right: -112px;
+  }
+}
+@media only screen and (max-width: 635px) {
+  nav {
+    height: 120px;
+  }
+  nav .mainli {
+    margin: 5px 10px;
+  }
+  .nav-uid {
+    margin: 0 12px 0 0 !important;
+  }
+  nav .subli {
+    margin-right: 0px !important;
+  }
+  #notifications {
+    right: -103px;
+  }
+}

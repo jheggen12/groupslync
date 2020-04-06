@@ -1,0 +1,148 @@
+* {
+  box-sizing: border-box;
+  padding: 5px;
+  margin: 5px auto;
+  font-family: arial;
+}
+.body1 {
+  background-color: black;
+}
+.mygroups {
+  background-color: black;
+  background-size: cover;
+}
+.mygroups main {
+  background-color: #3ca1c3;
+  text-align: center;
+  margin: 70px auto;
+  padding: 10px auto;
+  min-width: 550px;
+  max-width: 800px;
+  border-radius: 10px;
+  border: solid #ffa31a 5px;
+}
+p {
+  color: white;
+  font-size: 24px;
+}
+.groupRow a {
+  margin: 0;
+  padding: 0;
+}
+.groupRow {
+  position: relative;
+  margin: 0 auto;
+  border-radius: 50px;
+  border: 2px solid white;
+  background-color: white;
+  margin: 20px auto;
+  max-width: 650px;
+  min-height: 105px;
+}
+.groupRow span {
+  pointer-events: none;
+}
+.groupRow div {
+  pointer-events: none;
+}
+.groupRow:hover {
+  background-color: #ffcc80;
+  box-shadow: -5px -5px 10px 8px #eee, 5px 5px 10px 8px #eee;
+  border: none;
+}
+.totals {
+  font-weight: 600;
+  margin: 20px 10px;
+  min-width: 120px;
+  padding: 0;
+  position: absolute;
+  right: 65px;
+  top: 0;
+}
+.info {
+  font-weight: 600;
+  margin: 20px auto;
+  min-width: 140px;
+  padding: 0;
+  max-width: 190px;
+  overflow-wrap: break-word;
+  position: relative;
+  left: 25px;
+}
+.likes,
+.owner {
+  display: block;
+}
+.unread {
+  background-color: red;
+  color: white;
+  border-radius: 100%;
+  height: 30px;
+  width: 35px;
+  position: absolute;
+  left: 10px;
+  top: 30px;
+}
+.name {
+  font-weight: 800;
+  font-size: 24px;
+  margin-top: -1px;
+  padding: 5px;
+  font-family: lucida, sans-serif;
+  color: #090;
+  position: absolute;
+  width: 220px;
+  left: 42px;
+  top: 50%;
+  overflow-wrap: break-word;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+a:visited {
+  text-decoration: none !important;
+  color: black;
+}
+button {
+  /* post button */
+  margin: 20px 40%;
+}
+.fa-times {
+  color: red !important;
+}
+.fa-times:hover {
+  color: #f66 !important;
+}
+.groupRow i {
+  margin-top: -3px;
+  position: absolute;
+  right: 20px;
+  z-index: 3;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+i:hover {
+  cursor: pointer;
+  opacity: 50%;
+}
+#groupList a {
+  text-decoration: none;
+  color: black;
+  cursor: default;
+}
+@media only screen and (max-width: 810px) {
+  .mygroups main {
+    margin: 135px auto;
+  }
+}
+@media only screen and (max-width: 750px) {
+  .totals {
+    text-align: left;
+    right: 30px;
+  }
+}
+@media only screen and (max-width: 670px) {
+  .name {
+    width: 150px;
+  }
+}

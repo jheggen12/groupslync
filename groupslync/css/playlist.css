@@ -1,0 +1,80 @@
+* {
+  box-sizing: border-box;
+  padding: 5px;
+  margin: 5px auto;
+  font-family: arial;
+}
+html {
+  width: 100%;
+}
+.body1 {
+  background-color: black;
+}
+main {
+  text-align: center;
+}
+iframe {
+  /*media*/
+  padding: 0;
+  width: 90%;
+  margin: 8px auto 11px;
+}
+.postAndComments {
+  margin: 0;
+  padding: 0;
+}
+#recentPosts {
+  border-radius: 5px;
+  margin: 100px auto 18px;
+  width: 60%;
+  color: white;
+}
+#deleteButton {
+  margin: 50px auto;
+  padding: 10px;
+  font-size: 24px;
+  background-color: #ffa31a;
+  cursor: pointer;
+}
+#deleteButton:hover {
+  color: white;
+}
+@media only screen and (max-width: 950px) {
+  .postAndComments div {
+    width: 80%;
+  }
+}
+@media only screen and (max-width: 700px) {
+  .postAndComments {
+    margin: 0;
+    padding: 0;
+  }
+  .postAndComments div {
+    width: 100%;
+    margin-top: 0;
+  }
+  iframe {
+    /*media*/
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: solid gray 30%;
+  }
+  .body1 {
+    margin: 0;
+    padding: 0;
+  }
+  #recentPosts {
+    padding: 0;
+    margin: 120px 0 0;
+    width: 100%;
+  }
+  main {
+    padding: 0;
+    margin: 0;
+  }
+  * {
+    padding: 0;
+    margin: 0;
+  }
+}

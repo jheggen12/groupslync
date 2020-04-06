@@ -1,0 +1,62 @@
+* {
+  padding: 5px;
+  margin: 5px auto;
+  font-family: arial;
+}
+body {
+  background-color: black;
+}
+.container div {
+  border-radius: 5px;
+  margin: 100px auto;
+  color: white;
+  min-width: 400px;
+  text-align: center;
+}
+#features {
+  text-align: left;
+  width: fit-content;
+}
+h1 {
+  text-align: center;
+  justify-content: center;
+  width: 390px;
+  margin: 60px auto 0;
+  padding: 10px 0;
+  border-radius: 5px;
+  color: white;
+  font-size: 32px;
+  display: inline-flex;
+}
+a:visited {
+  text-decoration: none !important;
+}
+#button {
+  background-color: blue;
+  color: white;
+  margin: 0 auto;
+  font-size: 36px;
+  border: none;
+  width: 400px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+#button:hover {
+  padding: 15px 20px;
+  margin-top: -10px;
+}
+#cookies {
+  height: 80px;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: Roboto;
+  padding: 20px;
+  color: white;
+  background-color: blue;
+  width: 50%;
+  min-width: 600px;
+}
+#cookieLink {
+  text-decoration: underline;
+  cursor: pointer;
+}
