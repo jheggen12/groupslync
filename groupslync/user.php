@@ -1,5 +1,6 @@
 <?php
   require '../dbh.php';
+  require './commonFunctions.php';
   session_start();
   if(isset($_GET['group']) && $_GET['group'] == 'yes') {
     $group=1;
@@ -20,47 +21,24 @@
     <script src="js/jquery.cookie.js"></script>
   </head>
   <body class="body1">
+    <div id="scrollBlock"></div>
      <nav>
        <ul>
          <?php
 
          if (isset($_SESSION['uid'])) {
+           $uid=$_SESSION['uid'];
            echo '<li class="mainli"><a href="index.php"><img id="logo" src="includes/logo.png"><span id="home">Home</span></a></li>
            <li class="mainli"><a href="myGroups.php">My Groups</a></li>
            <li class="mainli"><a href="findGroups.php">Find Group</a></li>
            <li class="mainli"><a href="createGroup.php">New Group</a></li>
            <li class="mainli"><a href="connection.php"><img id="spotifyButton" src="includes/Spotify_Icon_RGB_Green.png"></a></li>
-           <li class="nav-uid"><a href="user.php?uid='.$_SESSION['uid'].'">'.$_SESSION['uid'].' <i class="fas fa-caret-down"></i></a>
+           <li class="nav-uid"><a href="user.php?uid='.$uid.'">'.$uid.' <i class="fas fa-caret-down"></i></a>
               <ul>
                 <li class="subli"><a href="help.php">Help</a></li>
                 <li class="subli"><a href="includes/logout.php?action=logout">Logout</a></li>
             </ul></li>';
-            $notifSql = 'SELECT*FROM notifications WHERE recipient=? ORDER BY id DESC LIMIT 30';
-            $stmt = mysqli_stmt_init($conn);
-            if(!mysqli_stmt_prepare($stmt, $notifSql)) {
-              exit();
-            } else {
-              mysqli_stmt_bind_param($stmt,"s", $_SESSION['uid']);
-              mysqli_stmt_execute($stmt);
-              $notifResult = mysqli_stmt_get_result($stmt);
-              $notifCheck = mysqli_num_rows($notifResult);
-              if($notifCheck > 0){
-                echo '<li style="float: right;" class="mainli"><i class="fas fa-bell"></i><ul id="notifications">';
-                echo '<button id="clearNotif">Clear</button>';
-                while ($notif = mysqli_fetch_assoc($notifResult)) { //in group, handle null title for text post
-                  if ($notif['type'] == "like") {
-                    echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' liked your post "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "comment") {
-                    echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' commented "'.$notif['comment'].'" on your post "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "join") {
-                    echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' joined your group "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "add") {
-                    echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' added you to group "'.$notif['title'].'"</a></li>';
-                  }
-                }
-                echo '</ul></li>';
-              }
-            }
+            loadNotifications($uid, $conn);
          } else {
            echo '<li class="mainli"><a href="index.php"><img id="logo" src="includes/logo.png"><span id="home">Home</span></a></li>
            <li class="mainli"><a href="findGroups.php">Find Group</a></li>
@@ -72,19 +50,18 @@
      </nav>
      <main id="main">
 <?php
-$uid = mysqli_real_escape_string($conn, $_GET['uid']);
-$sql = "SELECT uid FROM users WHERE uid='$uid'";
+$user = mysqli_real_escape_string($conn, $_GET['uid']);
+$sql = "SELECT uid FROM users WHERE uid='$user'";
 $result = mysqli_query($conn, $sql);
 if (mysqli_num_rows($result) > 0) {
-  $uid = $_GET['uid'];
   echo '<header>
-    <span>'.$uid.'</span></header>';
+    <span>'.$user.'</span></header>';
   if(isset($_GET['group'])) {
     if($_GET['group'] == 'yes') {
-      echo '<div id="button"><p>Group</p><a href="user.php?uid='.$uid.'">View public</a></div>';
+      echo '<div id="button"><p>Group</p><a href="user.php?uid='.$user.'">View public</a></div>';
     }
   } else {
-    echo '<div id="button"><p>Public</p><a href="user.php?uid='.$uid.'&group=yes">View group</a></div>';
+    echo '<div id="button"><p>Public</p><a href="user.php?uid='.$user.'&group=yes">View group</a></div>';
   }
 
  echo '<div class="postAndComments" id="groupFeed">';
@@ -95,12 +72,12 @@ if (mysqli_num_rows($result) > 0) {
     echo "Page load failures.";
     exit();
    } else {
-     mysqli_stmt_bind_param($stmt,"s",$uid);
+     mysqli_stmt_bind_param($stmt,"s",$user);
      mysqli_stmt_execute($stmt);
      $result = mysqli_stmt_get_result($stmt);
      $resultCheck = mysqli_num_rows($result);
      if ($resultCheck > 0) {
-       echo '<div id="recentPosts"><h1>Recent Posts</h1><button class="playlistButton" data-uid="'.$uid.'" data-type="posts" data-group="1">Create Playlist</button>';
+       echo '<div id="recentPosts"><h1>Recent Posts</h1><button class="playlistButton" data-uid="'.$user.'" data-type="posts" data-group="1">Create Playlist</button>';
        while ($post = mysqli_fetch_assoc($result)) {
           if ($post['type'] === 'spotLink') {
             echo '<iframe src="https://open.spotify.com/embed/track/'.$post['link'].'" height="80px" frameborder="10%" allowtransparency="true" allow="encrypted-media"></iframe>';
@@ -124,13 +101,13 @@ if (mysqli_num_rows($result) > 0) {
      echo "Page load failures.";
      exit();
     } else {
-      mysqli_stmt_bind_param($stmt,"s",$uid);
+      mysqli_stmt_bind_param($stmt,"s",$user);
       mysqli_stmt_execute($stmt);
       $result = mysqli_stmt_get_result($stmt);
       $resultCheck = mysqli_num_rows($result);
       if ($resultCheck > 0) {
         echo '<div id="recentLikes">
-        <h1>Recent Likes</h1><button class="playlistButton" data-uid="'.$uid.'" data-type="likes" data-group="1">Create Playlist</button>';
+        <h1>Recent Likes</h1><button class="playlistButton" data-uid="'.$user.'" data-type="likes" data-group="1">Create Playlist</button>';
         while ($post = mysqli_fetch_assoc($result)) {
           if ($post['type'] === 'spotLink') {
             echo '<iframe src="https://open.spotify.com/embed/track/'.$post['link'].'" height="80px" frameborder="10%" allowtransparency="true" allow="encrypted-media"></iframe>';
@@ -155,13 +132,13 @@ if (mysqli_num_rows($result) > 0) {
    echo "Page load failures.";
    exit();
   } else {
-    mysqli_stmt_bind_param($stmt,"s",$uid);
+    mysqli_stmt_bind_param($stmt,"s",$user);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $resultCheck = mysqli_num_rows($result);
     if ($resultCheck > 0) {
       echo '<div id="recentPosts">
-      <h1>Recent Posts</h1><button class="playlistButton" data-uid="'.$uid.'" data-type="posts" data-group="0">Create Playlist</button>';
+      <h1>Recent Posts</h1><button class="playlistButton" data-uid="'.$user.'" data-type="posts" data-group="0">Create Playlist</button>';
       while ($post = mysqli_fetch_assoc($result)) {
         if ($post['type'] === 'spotLink') {
           echo '<iframe src="https://open.spotify.com/embed/track/'.$post['link'].'" height="80px" frameborder="10%" allowtransparency="true" allow="encrypted-media"></iframe>';
@@ -185,13 +162,13 @@ if (mysqli_num_rows($result) > 0) {
     echo "Page load failures.";
     exit();
    } else {
-     mysqli_stmt_bind_param($stmt,"s",$uid);
+     mysqli_stmt_bind_param($stmt,"s",$user);
      mysqli_stmt_execute($stmt);
      $result = mysqli_stmt_get_result($stmt);
      $resultCheck = mysqli_num_rows($result);
      if ($resultCheck > 0) {
        echo '<div id="recentLikes">
-       <h1>Recent Likes</h1><button class="playlistButton" data-uid="'.$uid.'" data-type="likes" data-group="0">Create Playlist</button>';
+       <h1>Recent Likes</h1><button class="playlistButton" data-uid="'.$user.'" data-type="likes" data-group="0">Create Playlist</button>';
        while ($post = mysqli_fetch_assoc($result)) {
          if ($post['type'] === 'spotLink') {
            echo '<iframe src="https://open.spotify.com/embed/track/'.$post['link'].'" height="80px" frameborder="10%" allowtransparency="true" allow="encrypted-media"></iframe>';
@@ -220,5 +197,6 @@ if (mysqli_num_rows($result) > 0) {
     </main>
   </body>
   <script src="js/user.js" type="text/javascript"></script>
+  <script src="js/commonFunctions.js" type="text/javascript"></script>
   <script src="js/notifScript.js" type="text/javascript"></script>
 </html>

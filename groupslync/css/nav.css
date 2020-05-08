@@ -1,5 +1,19 @@
+:root {
+  --color1: #ffa31a;
+  --color2: #3ca1c3;
+  --color3: #ffcc80; /*Faded color 1*/
+  --color4: #8ac7db; /*Faded color 2*/
+}
 .currentPage {
-  box-shadow: 3px 3px gray, -3px -3px gray;
+  /* box-shadow: 3px 3px gray, -3px -3px gray; */
+}
+#scrollBlock {
+  position: fixed;
+  background-color: var(--color3);
+  width: 100%;
+  z-index: 4;
+  top: 0;
+  margin: 0;
 }
 .fa-bell {
   padding-bottom: 22px;
@@ -8,24 +22,27 @@
   margin-top: 10px;
   margin-right: 10px;
 }
+#bell {
+  float: right;
+}
 #notifications {
-  background-color: #ffa31a;
-  width: 300px;
+  background-color: var(--color4);
+  width: calc(100vw - 1150px);
   position: absolute;
   top: 48px;
-  right: -81px;
+  right: -71px;
   z-index: 5;
   list-style-type: none;
-  max-height: 300px;
+  height: calc(100vh - 73px);
   overflow-y: scroll;
   padding: 0;
   overflow-wrap: break-word;
-  color: navy;
-  border: solid black 3px;
+  color: white;
   line-height: 20px;
+  min-width: 220px;
 }
 #notifications a:hover {
-  color: navy !important;
+  color: white !important;
   opacity: 50%;
 }
 #notifications li {
@@ -40,7 +57,7 @@
   width: 100%;
   font-size: 20px;
   border: none;
-  background-color: #3ca1c3;
+  background-color: #ccc;
   color: white;
   font-style: italic;
   font-weight: bold;
@@ -52,22 +69,27 @@ nav {
   position: fixed;
   background-color: white;
   top: 0;
-  width: 100%;
   left: 0;
+  width: calc(100% - 40px);
   height: 65px;
   z-index: 5;
-  margin: 0;
+  margin: 10px 20px;
   padding: 0;
-  border-bottom: solid black 2px;
+  border-radius: 20px;
+  box-shadow: 0 0 5px 5px #ccc;
 }
-nav ul .nav-uid ul {
+.nav-uid > ul {
+  right: 0;
+  width: 110px;
   position: absolute;
   text-align: center;
-  margin-top: 0px;
+  margin-top: -10px;
   background-color: white;
-  margin-right: -25px;
+  margin-right: -5px;
   right: 0;
-  width: 140px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding: 20px 10px 8px;
 }
 nav ul li ul {
   display: none;
@@ -75,11 +97,10 @@ nav ul li ul {
 nav ul li:hover ul {
   /*makes logout menu appear*/
   display: block;
-  background-color: white;
   padding: 10px;
 }
 nav ul li ul li a {
-  color: navy;
+  color: white;
 }
 .nav-uid {
   float: right;
@@ -92,9 +113,6 @@ nav li {
   display: inline-block;
   position: relative;
   padding: 0 5px;
-}
-nav .subli {
-  margin-right: 20px !important;
 }
 nav .mainli {
   margin: 0;
@@ -117,14 +135,10 @@ nav li a {
   font-family: arial;
   display: block;
   padding: 0 3px;
-  color: navy !important;
+  color: black !important;
 }
 nav li a:hover {
-  color: red !important;
-}
-.fa-bell {
-  margin-top: 10px;
-  margin-right: 10px;
+  color: var(--color1) !important;
 }
 @media only screen and (max-width: 810px) {
   nav {

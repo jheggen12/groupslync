@@ -6,20 +6,20 @@ $genre = $_POST['genre'];
 $sort = $_POST['sort'];
 if(!empty($genre)) {
   if (!empty($sort) && $sort == 'new') {
-    $sql = 'SELECT link FROM publicposts WHERE genre=? AND postdate > DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND type="spotLink" ORDER BY postdate DESC LIMIT 100';
+    $sql = 'SELECT link FROM publicposts WHERE genre=? AND type="spotLink" ORDER BY postdate DESC LIMIT 100';
   } else {
-    $sql = 'SELECT link FROM publicposts WHERE genre=? AND postdate > DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND type="spotLink" ORDER BY likes DESC LIMIT 100';
+    $sql = 'SELECT link FROM publicposts WHERE genre=? AND postdate > DATE_SUB(CURDATE(), INTERVAL 28 DAY) AND type="spotLink" ORDER BY likes DESC LIMIT 100';
   }
 } else {
   if (!empty($sort) && $sort == 'new') {
-    $sql = 'SELECT link FROM publicposts WHERE postdate > DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND type="spotLink" ORDER BY postdate DESC LIMIT 100';
+    $sql = 'SELECT link FROM publicposts WHERE type="spotLink" ORDER BY postdate DESC LIMIT 100';
   } else {
-    $sql = 'SELECT link FROM publicposts WHERE postdate > DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND type="spotLink" ORDER BY likes DESC LIMIT 100';
+    $sql = 'SELECT link FROM publicposts WHERE postdate > DATE_SUB(CURDATE(), INTERVAL 28 DAY) AND type="spotLink" ORDER BY likes DESC LIMIT 100';
   }
 }
 $stmt = mysqli_stmt_init($conn);
 if(!mysqli_stmt_prepare($stmt,$sql)) {
-  echo "Error";
+  echo "Error1";
   exit();
 } else {
   if(!empty($genre)) {
@@ -39,7 +39,7 @@ if(!mysqli_stmt_prepare($stmt,$sql)) {
       }
     }
   } else {
-    echo 'Error';
+    echo 'Error2';
   }
   mysqli_stmt_close($stmt);
 }

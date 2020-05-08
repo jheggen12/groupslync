@@ -1,6 +1,8 @@
 <?php
   session_start();
   require '../dbh.php';
+  require './commonFunctions.php';
+
   if(isset($_SESSION['uid'])) {
     $uid = $_SESSION['uid'];
   } else {
@@ -29,6 +31,7 @@
     <title><?php echo $type?> Post</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/index.css" type="text/css">
+    <link rel="stylesheet" href="css/feed.css" type="text/css">
     <link rel="stylesheet" href="css/nav.css" type="text/css">
     <script src="https://kit.fontawesome.com/8b7394b262.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -49,32 +52,7 @@
                 <li class="subli"><a href="help.php">Help</a></li>
                 <li class="subli"><a href="includes/logout.php?action=logout">Logout</a></li>
             </ul></li>';
-            $notifSql = 'SELECT*FROM notifications WHERE recipient=? ORDER BY id DESC LIMIT 30';
-            $stmt = mysqli_stmt_init($conn);
-            if(!mysqli_stmt_prepare($stmt, $notifSql)) {
-              exit();
-            } else {
-              mysqli_stmt_bind_param($stmt,"s", $uid);
-              mysqli_stmt_execute($stmt);
-              $notifResult = mysqli_stmt_get_result($stmt);
-              $notifCheck = mysqli_num_rows($notifResult);
-              if($notifCheck > 0){
-                echo '<li style="float: right;" class="mainli"><i class="fas fa-bell"></i><ul id="notifications">';
-                echo '<button id="clearNotif">Clear</button>';
-                while ($notif = mysqli_fetch_assoc($notifResult)) { //in group, handle null title for text post
-                  if ($notif['type'] == "like") {
-                    echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' liked your post "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "comment") {
-                    echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' commented "'.$notif['comment'].'" on your post "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "join") {
-                    echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' joined your group "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "add") {
-                    echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' added you to group "'.$notif['title'].'"</a></li>';
-                  }
-                }
-                echo '</ul></li>';
-              }
-            }
+            loadNotifications($uid, $conn);
          } else {
            echo '<li class="mainli"><a href="index.php"><img id="logo" src="includes/logo.png"><span id="home">Home</span></a></li>
            <li class="mainli"><a href="findGroups.php">Find Group</a></li>
@@ -86,7 +64,7 @@
        </ul>
      </nav>
     
-     <main class="home">
+     <main class="feed">
 <?php
 if(!empty($_COOKIE['tzo'])) {
   $tz_offset = $_COOKIE['tzo'];

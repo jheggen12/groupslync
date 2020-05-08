@@ -11,27 +11,27 @@ a:visited {
   color: inherit;
 }
 .body {
-  background-color: black;
+  background-color: var(--color3);
 }
 textarea {
   resize: none;
 }
+input,
+textarea {
+  border: solid var(--color4) 3px;
+}
 h1 {
-  text-align: center;
-  margin: 0 auto;
-  padding: 10px 0;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  background-color: #ffa31a;
-  color: white;
+  padding: 30px;
+  color: gray;
   min-width: 300px;
 }
 main {
-  background-color: #3ca1c3;
+  background-color: white;
   margin-top: 100px;
   max-width: 500px;
   border-radius: 10px;
   padding: 0;
+  box-shadow: 0 0 5px 5px #ccc;
 }
 main ul {
   text-align: center;
@@ -49,19 +49,30 @@ main button {
   cursor: pointer;
   margin: 10px auto;
 }
+main button:hover {
+  background-color: var(--color3);
+}
 main ul li {
   cursor: pointer;
   background-color: white;
+  border: solid var(--color4) 1px;
 }
 main div {
   text-align: center;
-  color: white;
+  color: black;
+  line-height: 28px;
+}
+p {
+  color: red;
 }
 #message {
   padding-bottom: 25px;
 }
 #options li:hover {
-  background-color: #f7b31c;
+  background-color: var(--color3);
+}
+.selected {
+  background-color: var(--color3);
 }
 @media only screen and (max-width: 810px) {
   main {

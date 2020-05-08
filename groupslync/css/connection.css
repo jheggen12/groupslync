@@ -4,14 +4,18 @@
   font-family: arial;
 }
 body {
-  background-color: black;
+  background-color: var(--color3);
 }
 .container div {
   border-radius: 5px;
   margin: 100px auto;
-  color: white;
+  color: black;
   min-width: 400px;
+  width: 40%;
   text-align: center;
+  background-color: white;
+  padding: 25px;
+  box-shadow: 0 0 5px 5px #ccc;
 }
 #features {
   text-align: left;
@@ -21,10 +25,9 @@ h1 {
   text-align: center;
   justify-content: center;
   width: 390px;
-  margin: 60px auto 0;
+  margin: 0 auto;
   padding: 10px 0;
   border-radius: 5px;
-  color: white;
   font-size: 32px;
   display: inline-flex;
 }
@@ -32,18 +35,17 @@ a:visited {
   text-decoration: none !important;
 }
 #button {
-  background-color: blue;
+  background-color: var(--color2);
   color: white;
   margin: 0 auto;
-  font-size: 36px;
+  font-size: 28px;
+  padding: 10px;
   border: none;
-  width: 400px;
   border-radius: 20px;
   cursor: pointer;
 }
 #button:hover {
-  padding: 15px 20px;
-  margin-top: -10px;
+  background-color: var(--color4);
 }
 #cookies {
   height: 80px;

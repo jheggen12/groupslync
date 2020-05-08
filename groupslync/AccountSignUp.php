@@ -8,7 +8,7 @@
     <title>Sign Up</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/nav.css" type="text/css">
-    <link rel="stylesheet" href="css/musicStyle.css" type="text/css">
+    <link rel="stylesheet" href="css/signup.css" type="text/css">
     <script src="https://kit.fontawesome.com/8b7394b262.js"></script>
   </head>
   <body>
@@ -28,8 +28,6 @@
        </ul>
      </nav>
      <main>
-       <div id="createAccount">
-         <header>
           <h1>Register</h1>
            <?php
            if (isset($_GET['error'])) {
@@ -82,8 +80,6 @@
              <button class="submit" name="signup-submit" type="submit">Create Account</button>
            </form>';
           } ?>
-         </header>
-       </div>
     </main>
   </body>
 </html>

@@ -1,6 +1,8 @@
 <?php
   session_start();
   require '../dbh.php';
+  require './commonFunctions.php';
+
   if(!isset($_GET['id'])) {
     die();
   }
@@ -34,12 +36,14 @@
     ?>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/group.css" type="text/css">
+    <link rel="stylesheet" href="css/feed.css" type="text/css">
     <link rel="stylesheet" href="css/nav.css" type="text/css">
     <script src="https://kit.fontawesome.com/8b7394b262.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="js/jquery.cookie.js"></script>
   </head>
   <body class="body">
+     <div id="scrollBlock"></div>
      <nav>
        <ul>
 <?php
@@ -54,32 +58,7 @@ if (isset($_SESSION['uid'])) {
       <li class="subli"><a href="help.php">Help</a></li>
       <li class="subli"><a href="includes/logout.php?action=logout">Logout</a></li>
   </ul></li>';
-  $notifSql = 'SELECT*FROM notifications WHERE recipient=? ORDER BY id DESC LIMIT 30';
-  $stmt = mysqli_stmt_init($conn);
-  if(!mysqli_stmt_prepare($stmt,$notifSql)) {
-    exit();
-  } else {
-    mysqli_stmt_bind_param($stmt,"s", $uid);
-    mysqli_stmt_execute($stmt);
-    $notifResult = mysqli_stmt_get_result($stmt);
-    $notifCheck = mysqli_num_rows($notifResult);
-    if($notifCheck > 0){
-      echo '<li style="float: right;" class="mainli"><i class="fas fa-bell"></i><ul id="notifications">';
-      echo '<button id="clearNotif">Clear</button>';
-      while ($notif = mysqli_fetch_assoc($notifResult)) { //in group, handle null title for text post
-        if ($notif['type'] == "like") {
-          echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' liked your post "'.$notif['title'].'"</a></li>';
-        } elseif ($notif['type'] == "comment") {
-          echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' commented "'.$notif['comment'].'" on your post "'.$notif['title'].'"</a></li>';
-        } elseif ($notif['type'] == "join") {
-          echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' joined your group "'.$notif['title'].'"</a></li>';
-        } elseif ($notif['type'] == "add") {
-          echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' added you to group "'.$notif['title'].'"</a></li>';
-        }
-      }
-      echo '</ul></li>';
-    }
-  }
+  loadNotifications($uid, $conn);
 } else {
   echo '<li class="mainli"><a href="index.php"><img id="logo" src="includes/logo.png"><span id="home">Home</span></a></li>
   <li class="mainli"><a href="findGroups.php">Find Group</a></li>
@@ -89,7 +68,7 @@ if (isset($_SESSION['uid'])) {
 ?>
        </ul>
      </nav>
-     <main class="group">
+     <main class="feed">
        <?php
        echo '<div class="leftSidebar">';
        if ($resultCheck < 1) {
@@ -123,7 +102,6 @@ if (isset($_SESSION['uid'])) {
           echo "<h4>Private group</h4>";
         }
          if (!empty($uid) && !empty($groupid)) {
-           $uid = mysqli_real_escape_string($conn, $uid);
            $sql = "SELECT groups.name, groups.id, groups.postcount, groups.likecount FROM grouplikes LEFT JOIN groups ON grouplikes.groupid = groups.id WHERE grouplikes.uid='$uid' ORDER BY groups.name";
            $result = mysqli_query($conn, $sql);
            if (mysqli_num_rows($result) > 1) {
@@ -193,7 +171,6 @@ if (isset($groupid)) {
         }
         if(isset($_SESSION['uid']))  {
           $postid = $post['id'];
-          $uid = $_SESSION['uid'];
           $likeSql = "SELECT*FROM groupPostlikes WHERE postid='$postid' AND uid='$uid'";
           $iliked = mysqli_query($conn, $likeSql);
           if(mysqli_num_rows($iliked) > 0) {
@@ -271,7 +248,7 @@ if (isset($groupid)) {
         echo '<button class="loadMoreButton" data-groupid="'.$groupid.'">Load more posts</button>';
       }
     } else {
-      echo '<div class="main"><div class="post" id="noPosts">  There are no posts in this group yet. Be the first to submit a post! ----> </div></div>';
+      echo '<div class="main"><div class="post" id="noPosts">  There are no posts in this group yet. Be the first to submit a post! </div></div>';
     }
   }
 } else {
@@ -283,7 +260,7 @@ echo '<p>Page load failure.</p>';
       $sql = "SELECT uid FROM grouplikes WHERE groupid='$groupid' LIMIT 100";
       $result = mysqli_query($conn, $sql);
       $numMembers = mysqli_num_rows($result);
-      echo '<div class="rightSidebar"><button id="postButton">Post</button><button id="memberButton" class="hover">Members ('.$numMembers.')</button><div id="postForm">';
+      echo '<div class="rightSidebar"><button id="postButton" class="selected">Post</button><button id="memberButton" class="notSelected hover">Members ('.$numMembers.')</button><div id="postForm">';
       if (!empty($uid)) {
         echo '<select id="linkType" name="linkType">
           <option value="track" default>Song</option>
@@ -293,7 +270,7 @@ echo '<p>Page load failure.</p>';
         </select>';
         echo '<input id="postLink" name="link" type="text" autocomplete="off" placeholder="  Search Spotify here...">
         <ul id="searchResults" style="display: none;"></ul>
-      <br><textarea id="postText" name="desc" rows="4" cols="20" placeholder="&#10;        Add a comment"></textarea><button data-groupid="'.$groupid.'" data-private="'.$private.'" id="postSubmitButton" class="postSubmitButton" >Submit</button>';
+      <br><textarea id="postText" name="desc" rows="4" cols="20" placeholder="&#10;    Add a comment"></textarea><button data-groupid="'.$groupid.'" data-private="'.$private.'" id="postSubmitButton" class="postSubmitButton" >Submit</button>';
     } else {
       echo '<div>Create an account or log in to post in this group!</div>';
         if (!empty($_GET['error'])) {
@@ -347,6 +324,6 @@ echo '<p>Page load failure.</p>';
     ?>
     </main>
   </body>
-  <script src="js/group.js" type="text/javascript"></script>
+  <script type="module" src="js/group.js" type="text/javascript"></script>
   <script src="js/notifScript.js" type="text/javascript"></script>
 </html>

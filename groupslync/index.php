@@ -1,6 +1,8 @@
 <?php
   session_start();
   require '../dbh.php';
+  require './commonFunctions.php';
+  
   if(isset($_SESSION['uid'])) {
     $uid = $_SESSION['uid'];
   }
@@ -21,16 +23,17 @@
     <title>groupslync</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/index.css" type="text/css">
+    <link rel="stylesheet" href="css/feed.css" type="text/css">
     <link rel="stylesheet" href="css/nav.css" type="text/css">
     <script src="https://kit.fontawesome.com/8b7394b262.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="js/jquery.cookie.js"></script>
   </head>
   <body class="body">
+     <div id="scrollBlock"></div>
      <nav>
        <ul>
          <?php
-
          if (!empty($uid)) {
            echo '<li class="mainli"><a href="index.php" class="currentPage"><img id="logo" src="includes/logo.png"><span id="home">Home</span></a></li>
            <li class="mainli"><a href="myGroups.php">My Groups</a></li>
@@ -42,32 +45,7 @@
                 <li class="subli"><a href="help.php">Help</a></li>
                 <li class="subli"><a href="includes/logout.php?action=logout">Logout</a></li>
             </ul></li>';
-            $notifSql = 'SELECT*FROM notifications WHERE recipient=? ORDER BY id DESC LIMIT 30';
-            $stmt = mysqli_stmt_init($conn);
-            if(!mysqli_stmt_prepare($stmt, $notifSql)) {
-              exit();
-            } else {
-              mysqli_stmt_bind_param($stmt,"s", $uid);
-              mysqli_stmt_execute($stmt);
-              $notifResult = mysqli_stmt_get_result($stmt);
-              $notifCheck = mysqli_num_rows($notifResult);
-              if($notifCheck > 0){
-                echo '<li style="float: right;" class="mainli"><i class="fas fa-bell"></i><ul id="notifications">';
-                echo '<button id="clearNotif">Clear</button>';
-                while ($notif = mysqli_fetch_assoc($notifResult)) { //in group, handle null title for text post
-                  if ($notif['type'] == "like") {
-                    echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' liked your post "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "comment") {
-                    echo '<li><a href="post.php?'.$notif['content'].'">'.$notif['user'].' commented "'.$notif['comment'].'" on your post "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "join") {
-                    echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' joined your group "'.$notif['title'].'"</a></li>';
-                  } elseif ($notif['type'] == "add") {
-                    echo '<li><a href="group.php?id='.$notif['content'].'">'.$notif['user'].' added you to group "'.$notif['title'].'"</a></li>';
-                  }
-                }
-                echo '</ul></li>';
-              }
-            }
+            loadNotifications($uid, $conn);
          } else {
            echo '<li class="mainli"><a href="index.php" class="currentPage"><img id="logo" src="includes/logo.png"><span id="home">Home</span></a></li>
            <li class="mainli"><a href="findGroups.php">Find Group</a></li>
@@ -75,11 +53,9 @@
            <li class="mainli"><a href="connection.php"><img id="spotifyButton" src="includes/Spotify_Icon_RGB_Green.png"></a></li>';
          }
           ?>
-
        </ul>
      </nav>
-    
-     <main class="home">
+     <main class="feed">
         <?php
         echo '<div class="leftSidebar">';
         if (!empty($genre)) {
@@ -255,7 +231,7 @@ if(!mysqli_stmt_prepare($stmt,$sql)) {
       echo '<button class="loadMoreButton" data-sort="'.$sort.'" data-genre="'.$genre.'">Load more posts</button>';
     }
   } else {
-    echo '<div class="main"><div class="post" id="noPosts">  There are no posts in this feed yet.<br><br> Be the first to submit a post! ----> </div></div>';
+    echo '<div class="main"><div class="post" id="noPosts">  There are no posts in this feed yet.<br><br> Be the first to submit a post! </div></div>';
   }
 }
 ?>
@@ -311,7 +287,7 @@ echo '<div><p>Welcome to groupslync. Log in and connect your Spotify account to 
   } 
   echo ' required>
   <input id="pwd" name="pwd" type="password" placeholder="           Password" required>
-  <br><br><button id="login-submit" name="login-submit" type="submit">Log in</button></form>
+  <button id="login-submit" name="login-submit" type="submit">Log in</button></form>
   <p id="register">New to groupslync? Click <a href="AccountSignUp.php">here</a> to create a new account</p>';
 }
 echo '</div>'; //Close postForm Div
@@ -326,13 +302,13 @@ echo '</div>'; //close off rightSidebar div
 if(empty($_COOKIE['cookies'])) {
   echo '<div id="cookies">This site uses cookies to improve your experience. Click<span id="cookieLink">here</span>to accept</div>';
 } elseif (!isset($_COOKIE['refresh_token'])) {
-  echo '<div id="spotLogin">This website functions much more smoothly with a Spotify login. Click <a style="color: blue;" href="connection.php">here</a> to login.</div>';
+  echo '<div id="spotLogin">Login with Spotify to improve your browsing experience. Click <a style="color: blue;" href="connection.php">here</a> to login.</div>';
 }
 ?>
      </div>
    </main>
   </body>
-  <script src="js/index.js" type="text/javascript"></script>
+  <script type="module" src="js/index.js" type="text/javascript"></script>
   <script src="js/notifScript.js" type="text/javascript"></script>
 <script>
 function SortChange(value) {

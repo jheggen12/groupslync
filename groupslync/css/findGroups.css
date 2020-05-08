@@ -5,20 +5,20 @@
   font-family: arial;
 }
 .findGroups {
-  background-color: black;
-  background-size: cover;
+  background-color: var(--color3);
   padding: 0;
 }
-.findGroups main {
-  background-color: #3ca1c3;
+main {
+  background-color: white;
   text-align: center;
   min-width: 650px;
   width: 35%;
   border-radius: 10px;
   margin: 100px auto;
   padding: 0;
+  box-shadow: 0 0 5px 5px #ccc;
 }
-.findGroups main p {
+main p {
   font-size: 24px;
 }
 select {
@@ -37,13 +37,10 @@ input {
   width: 200px;
 }
 h1 {
-  color: white;
-  text-align: center;
-  background-color: #ffa31a;
-  margin: 0 auto;
-  padding: 10px 0;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  text-align: left;
+  padding: 30px;
+  color: gray;
+  min-width: 300px;
 }
 td {
   border-top: 1px solid black;
@@ -95,7 +92,7 @@ a:visited {
   color: blue;
 }
 @media only screen and (max-width: 810px) {
-  .findGroups main {
+  main {
     margin: 150px auto;
   }
 }

@@ -5,7 +5,7 @@
   font-family: arial;
 }
 body {
-  background-color: black;
+  background-color: var(--color3);
 }
 select {
   width: 200px;
@@ -33,11 +33,14 @@ input {
   width: 165px;
   font-size: 20px;
   box-shadow: inset -3px -3px 10px #cc870a;
-  background-color: #ffa31a;
+  background-color: var(--color1);
   color: white;
   border-radius: 15px;
   font-style: italic;
   padding: 0;
+}
+#button:hover {
+  background-color: var(--color3);
 }
 textarea {
   display: block;
@@ -46,23 +49,21 @@ textarea {
   border: solid #ffa31a 3px;
 }
 h1 {
-  color: white;
-  text-align: center;
-  background-color: #ffa31a;
-  margin: 0 auto;
-  padding: 10px 0;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  color: gray;
+  padding: 20px 20px 0px;
+  text-align: left;
+  font-size: 18px;
 }
 main {
   text-align: center;
   margin: 0 auto;
   padding: 0;
   border-radius: 10px;
-  color: white;
-  background-color: #3ca1c3;
+  color: black;
   margin-top: 110px;
   width: 260px;
+  background-color: white;
+  box-shadow: 0 0 5px 5px #ccc;
 }
 @media only screen and (max-width: 810px) {
   h1 {

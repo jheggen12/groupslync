@@ -2,7 +2,7 @@
 session_start();
 require '../../dbh.php';
 
-$groupid = $_POST['groupid'];
+$groupId = $_POST['groupId'];
 
 $sql = 'SELECT link FROM groupposts WHERE groupid=? AND type="spotLink" ORDER BY postdate DESC LIMIT 100';
 $stmt = mysqli_stmt_init($conn);
@@ -10,7 +10,7 @@ if(!mysqli_stmt_prepare($stmt,$sql)) {
   echo "Error";
   exit();
 } else {
-  mysqli_stmt_bind_param($stmt,"s",$groupid);
+  mysqli_stmt_bind_param($stmt, "s", $groupId);
   mysqli_stmt_execute($stmt);
   $result = mysqli_stmt_get_result($stmt);
   $resultCheck = mysqli_num_rows($result);

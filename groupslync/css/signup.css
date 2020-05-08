@@ -1,0 +1,56 @@
+* {
+  box-sizing: border-box;
+  padding: 5px;
+  margin: 5px auto;
+  font-family: arial;
+}
+body {
+  background-color: var(--color3);
+}
+h1 {
+  padding: 30px;
+  color: gray;
+}
+form {
+  text-align: center;
+}
+main {
+  background-color: white;
+  margin-top: 100px;
+  max-width: 500px;
+  border-radius: 10px;
+  padding: 0;
+  box-shadow: 0 0 5px 5px #ccc;
+}
+input {
+  width: 150px;
+  border: solid #ffa31a 3px;
+}
+header section {
+  text-align: center;
+  width: 80%;
+}
+button {
+  /* post button */
+  margin: 5px auto 10px;
+  height: 40px;
+  width: 160px;
+  font-size: 20px;
+  box-shadow: inset -3px -3px 10px #cc870a;
+  background-color: #ffa31a;
+  color: white;
+  border-radius: 15px;
+  font-style: italic;
+  padding: 0;
+  cursor: pointer;
+}
+button:hover {
+  background-color: var(--color3);
+}
+#new-login-submit {
+  width: 80px;
+  margin: 15px auto 0;
+}
+a:visited {
+  text-decoration: none !important;
+}

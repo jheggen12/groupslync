@@ -1,3 +1,14 @@
+import {
+  refreshSpotifyToken,
+  getBasicTokenFromSpotify,
+  searchRequest,
+  getBasicAuthFromHeroku,
+  getUserIdFromSpotify,
+  createSpotifyPlaylist,
+  addSongsToPlaylist,
+  addTzoCookie,
+} from "./commonFunctions.js";
+
 $(function () {
   const homeFeed = document.getElementById("homeFeed");
   let numPosts = 8,
@@ -5,17 +16,7 @@ $(function () {
     basic_token;
   const cookieLink = document.getElementById("cookieLink");
   if (cookieLink) {
-    cookieLink.addEventListener("click", function () {
-      let d = new Date();
-      d.setTime(d.getTime() + 315360000000);
-      const expires = "expires=" + d.toUTCString();
-      timezone_offset_seconds = new Date().getTimezoneOffset() * 60;
-      timezone_offset_seconds = timezone_offset_seconds == 0 ? 0 : -timezone_offset_seconds;
-      document.cookie = "tzo=" + (timezone_offset_seconds + 21600) + ";expires=" + expires;
-      document.cookie = "cookies=yes;expires=" + expires;
-      $("#cookies").fadeOut(500);
-      window.location.reload();
-    });
+    cookieLink.addEventListener("click", addTzoCookie);
   }
   homeFeed.addEventListener("click", (event) => {
     const target = event.target,
@@ -242,22 +243,14 @@ $(function () {
   const postSubmit = document.getElementById("postSubmitButton"),
     postInput = document.getElementById("postLink");
   if (postSubmit) {
-    $.ajax({
-      /*Basic spotify auth for search function*/
-      url: "https://musicauthbackend.herokuapp.com/search",
-      success: function (data) {
-        auth = "Basic " + data.token;
-        $.post({
-          url: "https://accounts.spotify.com/api/token",
-          headers: { Authorization: auth },
-          data: { grant_type: "client_credentials" },
-          success: function (tokenInfo) {
-            basic_token = "Bearer " + tokenInfo.access_token;
-          },
-        });
-      },
-      error: function () {},
-    });
+    getBasicAuthFromHeroku()
+      .then((authorization) => {
+        auth = authorization;
+        return getBasicTokenFromSpotify(authorization);
+      })
+      .then((token) => {
+        basic_token = token;
+      });
     postSubmit.addEventListener("click", function () {
       const postLink = $("#postLink"),
         postText = $("#postText"),
@@ -291,18 +284,6 @@ $(function () {
         },
       });
     });
-    function searchRequest(searchBar, callback, delay) {
-      let timer = null;
-      searchBar.onkeyup = function () {
-        if (timer) {
-          window.clearTimeout(timer);
-        }
-        timer = window.setTimeout(function () {
-          timer = null;
-          callback();
-        }, delay);
-      };
-    }
     searchRequest(postInput, getSearchResults, 1000);
     const searchUL = document.getElementById("searchResults");
     function getSearchResults() {
@@ -449,81 +430,39 @@ $(function () {
       searchUL.style.display = "none";
     });
   }
-  const playlistButton = document.getElementById("playlistButton");
-  if (playlistButton) {
-    playlistButton.addEventListener("click", function () {
-      //Throws error if no playlist button
-      const genre = $(playlistButton).data("genre"),
-        sort = $(playlistButton).data("sort");
-      let playlistName = "Groupslync ";
-      if (genre) playlistName += genre;
-      else playlistName = "Home Feed"; /* Add name of website here?*/
-      if (sort) playlistName += " new";
-      playlistName += " Playlist";
-      let refresh_token = $.cookie("refresh_token");
-      $.ajax({
-        //First refresh the spotify token
-        url: "https://musicauthbackend.herokuapp.com/refresh_token",
-        data: { refresh_token },
-        success: function (data) {
-          const access_token = "Bearer " + data.access_token;
-          $.get({
-            //Gets user ID from spotify
-            url: "https://api.spotify.com/v1/me",
-            headers: {
-              Authorization: access_token,
-              "Content-Type": "application/json",
-            },
-            success: function (userInfo) {
-              const userId = userInfo.id;
-              $.post({
-                //Creates Spotify playlist
-                url: `https://api.spotify.com/v1/users/${userId}/playlists`,
-                data: JSON.stringify({ name: playlistName }),
-                headers: {
-                  Authorization: access_token,
-                  "Content-Type": "application/json",
-                },
-                success: function (newPlaylist) {
-                  const newPlaylistId = newPlaylist.id;
-                  $.post({
-                    //Creates array of songs
-                    url: "includes/createPublicPlaylist.php",
-                    data: { genre: genre, sort: sort },
-                    success: function (songURIs) {
-                      const songArray = songURIs.split(",");
-                      $.post({
-                        //Adds the songs to the Spotify playlist
-                        url: `https://api.spotify.com/v1/playlists/${newPlaylistId}/tracks`,
-                        data: JSON.stringify({ uris: songArray }),
-                        headers: {
-                          Authorization: access_token,
-                          "Content-Type": "application/json",
-                        },
-                        success: function () {
-                          window.location.href = "./playlist.php?id=" + newPlaylistId;
-                        },
-                        error: function () {
-                          alert("Unable to add tracks to playlist.");
-                        },
-                      });
-                    },
-                    error: function () {
-                      alert("Unable to add tracks to playlist.");
-                    },
-                  });
-                },
-                error: function () {
-                  alert("Unable to create playlist. You may need to re-authorize with Spotify.");
-                },
-              });
-            },
-            error: function () {
-              alert("Failed. You may need to re-authorize with Spotify.");
-            },
-          });
+  function gatherSongsForPlaylist(genre, sort) {
+    return new Promise((resolve, reject) => {
+      $.post({
+        //Creates array of songs
+        url: "includes/createPublicPlaylist.php",
+        data: { genre, sort },
+        success: function (songURIs) {
+          resolve(songURIs.split(","));
+        },
+        error: function () {
+          reject("Unable to add tracks to playlist.");
         },
       });
+    });
+  }
+  const playlistButton = document.getElementById("playlistButton");
+  if (playlistButton) {
+    playlistButton.addEventListener("click", async function () {
+      const genre = $(playlistButton).data("genre"),
+        sort = $(playlistButton).data("sort"),
+        refresh_token = $.cookie("refresh_token");
+      let playlistName = "Groupslync ";
+      if (genre) playlistName += genre;
+      else playlistName = "Home Feed";
+      if (sort) playlistName += " new";
+      playlistName += " Playlist";
+      const access_token = await refreshSpotifyToken(refresh_token);
+      const userId = await getUserIdFromSpotify(access_token);
+      const [newPlaylistId, songArray] = await Promise.all([
+        createSpotifyPlaylist(userId, playlistName, access_token),
+        gatherSongsForPlaylist(genre, sort),
+      ]);
+      window.location.href = addSongsToPlaylist(newPlaylistId, songArray, access_token);
     });
   }
   const Confirm = (type) => {

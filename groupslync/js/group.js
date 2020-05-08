@@ -1,30 +1,28 @@
-$(function() {
+import {
+  refreshSpotifyToken,
+  getBasicTokenFromSpotify,
+  searchRequest,
+  getBasicAuthFromHeroku,
+  getUserIdFromSpotify,
+  createSpotifyPlaylist,
+  addSongsToPlaylist,
+  addTzoCookie
+} from "./commonFunctions.js";
+
+$(function () {
   const groupFeed = document.getElementById("groupFeed");
   let numPosts = 8,
     auth,
     basic_token;
   const cookieLink = document.getElementById("cookieLink");
   if (cookieLink) {
-    cookieLink.addEventListener("click", function() {
-      let d = new Date();
-      d.setTime(d.getTime() + 315360000000);
-      const expires = "expires=" + d.toUTCString();
-      timezone_offset_seconds = new Date().getTimezoneOffset() * 60;
-      timezone_offset_seconds = timezone_offset_seconds == 0 ? 0 : -timezone_offset_seconds;
-      document.cookie = "tzo=" + (timezone_offset_seconds + 21600) + ";expires=" + expires;
-      document.cookie = "cookies=yes;expires=" + expires;
-      $("#cookies").fadeOut(500);
-      window.location.reload();
-    });
+    cookieLink.addEventListener("click", addTzoCookie );
   } //cookies pop-up
-  groupFeed.addEventListener("click", event => {
+  groupFeed.addEventListener("click", (event) => {
     const target = event.target,
       eventClass = event.target.className;
     if (eventClass == "commButton") {
-      const postid = $(target)
-          .parent()
-          .parent()
-          .data("postid"),
+      const postid = $(target).parent().parent().data("postid"),
         commentSection = document.getElementById("comments" + postid);
       if (commentSection.style.display == "none") {
         commentSection.style.display = "block";
@@ -34,58 +32,40 @@ $(function() {
         target.innerHTML = "View " + target.innerHTML.substr(4);
       }
     } else if (eventClass == "likeButton") {
-      const postid = $(target)
-        .parent()
-        .parent()
-        .data("postid");
-      const poster = $(target)
-        .parent()
-        .parent()
-        .data("poster");
-      const title = $(target)
-        .parent()
-        .parent()
-        .data("title");
+      const postid = $(target).parent().parent().data("postid");
+      const poster = $(target).parent().parent().data("poster");
+      const title = $(target).parent().parent().data("title");
       const spanElement = target.firstChild;
       $.post({
         url: "includes/likeGroupPost.php",
         data: { postid, poster, title },
-        success: function() {
+        success: function () {
           const likeCount = parseInt(spanElement.innerHTML);
           spanElement.innerHTML = likeCount + 1;
           spanElement.style.color = "white";
           target.className = "likeButtonLiked";
         },
-        error: function() {
+        error: function () {
           alert("An error occurred with this like.");
-        }
+        },
       });
     } else if (eventClass == "likeButtonLiked") {
-      const postid = $(target)
-        .parent()
-        .parent()
-        .data("postid");
-      const poster = $(target)
-        .parent()
-        .parent()
-        .data("poster");
-      const title = $(target)
-        .parent()
-        .parent()
-        .data("title");
+      const postid = $(target).parent().parent().data("postid");
+      const poster = $(target).parent().parent().data("poster");
+      const title = $(target).parent().parent().data("title");
       const spanElement = target.firstChild;
       $.post({
         url: "includes/unlikeGroupPost.php",
         data: { postid, poster, title },
-        success: function() {
+        success: function () {
           const likeCount = parseInt(spanElement.innerHTML);
           spanElement.innerHTML = likeCount - 1;
           spanElement.style.color = "black";
           target.className = "likeButton";
         },
-        error: function() {
+        error: function () {
           alert("An error occurred with this unlike.");
-        }
+        },
       });
     } else if (eventClass == "heart") {
       const linkid = $(target).data("linkid"),
@@ -95,7 +75,7 @@ $(function() {
         //Adds the songs to the Spotify playlist
         url: "https://musicauthbackend.herokuapp.com/refresh_token/",
         data: { refresh_token },
-        success: function(data) {
+        success: function (data) {
           let access_token = "Bearer " + data.access_token;
           if (linktype == "spotLink") {
             $.ajax({
@@ -104,15 +84,15 @@ $(function() {
               data: JSON.stringify({ ids: [linkid] }),
               headers: {
                 Authorization: access_token,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
               },
-              success: function() {
+              success: function () {
                 target.className = "heartLiked";
                 target.innerText = "Saved!";
               },
-              error: function() {
+              error: function () {
                 alert("Unable to like song.");
-              }
+              },
             });
           } else if (linktype == "spotAlbum") {
             $.ajax({
@@ -121,15 +101,15 @@ $(function() {
               data: JSON.stringify({ ids: [linkid] }),
               headers: {
                 Authorization: access_token,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
               },
-              success: function() {
+              success: function () {
                 target.className = "heartLiked";
                 target.innerText = "Saved!";
               },
-              error: function() {
+              error: function () {
                 alert("Unable to like album.");
-              }
+              },
             });
           } else if (linktype == "spotPlaylist") {
             $.ajax({
@@ -137,15 +117,15 @@ $(function() {
               url: "https://api.spotify.com/v1/playlists/" + linkid + "/followers",
               headers: {
                 Authorization: access_token,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
               },
-              success: function() {
+              success: function () {
                 target.className = "heartLiked";
                 target.innerText = "Saved!";
               },
-              error: function() {
+              error: function () {
                 alert("Unable to like playlist.");
-              }
+              },
             });
           } else if (linktype == "spotArtist") {
             $.ajax({
@@ -153,18 +133,18 @@ $(function() {
               url: "https://api.spotify.com/v1/me/following?type=artist&ids=" + linkid,
               headers: {
                 Authorization: access_token,
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
               },
-              success: function() {
+              success: function () {
                 target.className = "heartLiked";
                 target.innerText = "Saved!";
               },
-              error: function() {
+              error: function () {
                 alert("Unable to like artist.");
-              }
+              },
             });
           }
-        }
+        },
       });
     } else if (eventClass == "deleteComment" || eventClass == "deleteComment temp") {
       if (Confirm("comment")) {
@@ -172,34 +152,28 @@ $(function() {
         $.post({
           url: "includes/removeGroupComment.php",
           data: { commentid: commentid },
-          success: function() {
+          success: function () {
             target.remove();
             $("#comment" + commentid).fadeOut(1200);
           },
-          error: function() {
+          error: function () {
             alert("Unable to delete comment.");
-          }
+          },
         });
       }
     } else if (eventClass == "deletePost") {
-      let postid = $(target)
-          .parent()
-          .parent()
-          .data("postid"),
-        groupid = $(target)
-          .parent()
-          .parent()
-          .data("groupid");
+      let postid = $(target).parent().parent().data("postid"),
+        groupid = $(target).parent().parent().data("groupid");
       if (Confirm("post")) {
         $.post({
           url: "includes/removeGroupPost.php",
           data: { postid, groupid },
-          success: function() {
+          success: function () {
             $("#post" + postid).slideUp(1200);
           },
-          error: function() {
+          error: function () {
             alert("Unable to delete post.");
-          }
+          },
         });
       }
     } else if (eventClass == "loadMoreCommButton") {
@@ -208,7 +182,7 @@ $(function() {
       $.post({
         url: "includes/loadMoreGroupComments.php",
         data: { numComments, postId },
-        success: function(data) {
+        success: function (data) {
           target.remove();
           $(".temp").remove();
           if ($("#commForm" + postId).length) {
@@ -218,41 +192,32 @@ $(function() {
           }
           target.setAttribute("data-comments", numComments + 5);
         },
-        error: function() {
+        error: function () {
           alert("Unable to load more comments.");
-        }
+        },
       });
     } else if (eventClass == "loadMoreButton") {
       const groupid = $(target).data("groupid");
       $.post({
         url: "includes/loadMoreGroupPosts.php",
         data: { numPosts, groupid },
-        success: function(data) {
+        success: function (data) {
           target.remove();
           $(".postAndComments").append(data);
           numPosts += 8;
         },
-        error: function() {
+        error: function () {
           alert("Unable to load more posts.");
-        }
+        },
       });
     }
   });
-  groupFeed.addEventListener("keydown", event => {
+  groupFeed.addEventListener("keydown", (event) => {
     const target = event.target;
     if (event.key === "Enter" && target.className == "commentBox") {
-      const postid = $(target)
-        .parent()
-        .parent()
-        .data("postid");
-      const poster = $(target)
-        .parent()
-        .parent()
-        .data("poster");
-      const title = $(target)
-        .parent()
-        .parent()
-        .data("title");
+      const postid = $(target).parent().parent().data("postid");
+      const poster = $(target).parent().parent().data("poster");
+      const title = $(target).parent().parent().data("title");
       const commentText = $("#commForm" + postid);
       $.post({
         url: "includes/newGroupComment.php",
@@ -260,9 +225,9 @@ $(function() {
           text: commentText.val(),
           postid,
           poster,
-          title
+          title,
         },
-        success: function(data) {
+        success: function (data) {
           if ($("#loadMoreCommButton" + postid).length) {
             $(data)
               .hide()
@@ -276,14 +241,14 @@ $(function() {
           }
           commentText.val("");
         },
-        error: function() {
+        error: function () {
           if ($("#loadMoreCommButton" + postid).length) {
             $("<p>Comment failed to post.</p>").insertBefore($("#loadMoreCommButton" + postid));
           } else {
             $("<p>Comment failed to post.</p>").insertBefore($("#commForm" + postid));
           }
           commentText.val("");
-        }
+        },
       });
     }
   });
@@ -291,57 +256,48 @@ $(function() {
     memberButton = document.getElementById("memberButton"),
     postForm = document.getElementById("postForm"),
     postButton = document.getElementById("postButton");
-  memberButton.onclick = function() {
+  memberButton.onclick = function () {
     members.style.display = "block";
     postForm.style.display = "none";
-    postButton.style.backgroundColor = "#ffa31a";
-    memberButton.style.backgroundColor = "#3ca1c3";
-    postButton.className = "hover";
-    memberButton.className = "";
+    // postButton.style.backgroundColor = "#ffa31a";
+    // memberButton.style.backgroundColor = "#3ca1c3";
+    postButton.className = "notSelected hover";
+    memberButton.className = "selected";
   };
-  postButton.onclick = function() {
+  postButton.onclick = function () {
     postForm.style.display = "block";
     members.style.display = "none";
-    memberButton.style.backgroundColor = "#ffa31a";
-    postButton.style.backgroundColor = "#3ca1c3";
-    memberButton.className = "hover";
-    postButton.className = "";
+    // memberButton.style.backgroundColor = "#ffa31a";
+    // postButton.style.backgroundColor = "#3ca1c3";
+    memberButton.className = "notSelected hover";
+    postButton.className = "selected";
   };
   const postSubmit = document.getElementById("postSubmitButton"),
     postInput = document.getElementById("postLink");
   if (postSubmit) {
-    $.ajax({
-      url: "https://musicauthbackend.herokuapp.com/search",
-      success: function(data) {
-        auth = "Basic " + data.token;
-        $.post({
-          url: "https://accounts.spotify.com/api/token",
-          headers: { Authorization: auth },
-          data: { grant_type: "client_credentials" },
-          success: function(tokenInfo) {
-            basic_token = "Bearer " + tokenInfo.access_token;
-          }
-        });
-      }
-    }); /*Basic spotify auth for search function*/
-    postSubmit.addEventListener("click", function() {
+    getBasicAuthFromHeroku()
+      .then((authorization) => {
+        auth = authorization;
+        return getBasicTokenFromSpotify(authorization);
+      })
+      .then((token) => {
+        basic_token = token; //sets the basic token for spotify searching
+      });
+    postSubmit.addEventListener("click", function () {
       const postLink = $("#postLink"),
         postText = $("#postText"),
         title = $("#postLink").attr("data-title"),
         groupid = $(postSubmit).data("groupid"),
-        private = $(postSubmit).data("private");
+        priv = $(postSubmit).data("private: priv");
       $.post({
         url: "includes/newGroupPost.php",
-        data: { desc: postText.val(), link: postLink.val(), groupid, private, title },
-        success: function(data) {
+        data: { desc: postText.val(), link: postLink.val(), groupid, private: priv, title },
+        success: function (data) {
           if (data.indexOf("ERROR -") != -1) {
             $("#postForm h6").remove();
             $("#postForm").prepend($(data));
           } else {
-            $(data)
-              .hide()
-              .prependTo($("#groupFeed"))
-              .slideDown(3000);
+            $(data).hide().prependTo($("#groupFeed")).slideDown(3000);
             $("#noPosts").remove();
             numPosts++;
             postLink.val("");
@@ -349,25 +305,13 @@ $(function() {
             $(postInput).removeAttr("data-title");
           }
         },
-        error: function() {
+        error: function () {
           alert("Error");
           postLink.val("");
           postText.val("");
-        }
+        },
       });
     });
-    function searchRequest(searchBar, callback, delay) {
-      let timer = null;
-      searchBar.onkeyup = function() {
-        if (timer) {
-          window.clearTimeout(timer);
-        }
-        timer = window.setTimeout(function() {
-          timer = null;
-          callback();
-        }, delay);
-      };
-    }
     searchRequest(postInput, getSearchResults, 1000);
     const searchUL = document.getElementById("searchResults");
     function getSearchResults() {
@@ -382,11 +326,11 @@ $(function() {
         url: "https://api.spotify.com/v1/search",
         headers: { Authorization: basic_token },
         data: { q: search, type: linkType, limit: "5" },
-        success: function(results) {
+        success: function (results) {
           searchUL.textContent = "";
           if (linkType == "track") {
             if (results.tracks.items.length != 0) {
-              results.tracks.items.forEach(result => {
+              results.tracks.items.forEach((result) => {
                 let newResult = document.createElement("li"),
                   resultImage = document.createElement("img"),
                   resultInfo = document.createElement("span"),
@@ -416,7 +360,7 @@ $(function() {
             }
           } else if (linkType == "album") {
             if (results.albums.items.length != 0) {
-              results.albums.items.forEach(result => {
+              results.albums.items.forEach((result) => {
                 let newResult = document.createElement("li"),
                   resultImage = document.createElement("img"),
                   resultInfo = document.createElement("span"),
@@ -446,7 +390,7 @@ $(function() {
             }
           } else if (linkType == "playlist") {
             if (results.playlists.items.length != 0) {
-              results.playlists.items.forEach(result => {
+              results.playlists.items.forEach((result) => {
                 let newResult = document.createElement("li"),
                   resultInfo = document.createElement("span"),
                   resultName = document.createElement("p"),
@@ -471,7 +415,7 @@ $(function() {
             }
           } else if (linkType == "artist") {
             if (results.artists.items.length != 0) {
-              results.artists.items.forEach(result => {
+              results.artists.items.forEach((result) => {
                 let newResult = document.createElement("li"),
                   resultImage = document.createElement("img"),
                   resultName = document.createElement("p"),
@@ -496,12 +440,12 @@ $(function() {
             }
           }
         },
-        error: function() {
+        error: function () {
           alert("Spotify token expired. Please refresh the page.");
-        }
+        },
       });
     }
-    searchUL.addEventListener("click", function(event) {
+    searchUL.addEventListener("click", function (event) {
       let target = event.target;
       if (target.className == "searchResult") {
         $(postInput).val(target.getAttribute("data-exurl"));
@@ -510,14 +454,14 @@ $(function() {
       }
     });
     const postType = document.getElementById("linkType");
-    postType.addEventListener("click", function() {
+    postType.addEventListener("click", function () {
       searchUL.style.display = "none";
     });
   }
   //left buttons for group options
   const leftButton = document.getElementById("leftButton");
   if (leftButton) {
-    leftButton.addEventListener("click", function() {
+    leftButton.addEventListener("click", function () {
       const buttonAction = $(leftButton).data("action"),
         groupid = $(leftButton).data("groupid");
       if (buttonAction == "join") {
@@ -526,7 +470,7 @@ $(function() {
         $.post({
           url: "includes/newGroupLike.php",
           data: { groupid, host, title },
-          success: function(data) {
+          success: function (data) {
             if (data.indexOf("ERROR -") != -1) {
               $(".leftSidebar").append($(data));
             } else {
@@ -534,15 +478,15 @@ $(function() {
               $("#leftButtons").prepend("<p>Group like successful.</p>");
             }
           },
-          error: function() {
+          error: function () {
             alert("Like failed");
-          }
+          },
         });
       } else if (buttonAction == "leave") {
         $.post({
           url: "includes/removeGroupLike.php",
           data: { groupid },
-          success: function(data) {
+          success: function (data) {
             if (data.indexOf("ERROR-") != -1) {
               $("#leftButtons").prepend($(data));
             } else {
@@ -550,9 +494,9 @@ $(function() {
               $("#leftButtons").prepend("<p>Group unlike successful.</p>");
             }
           },
-          error: function() {
+          error: function () {
             alert("Leave group failed");
-          }
+          },
         });
       } else if (buttonAction == "delete") {
         const confirm = Confirm("delete");
@@ -560,16 +504,16 @@ $(function() {
           $.post({
             url: "includes/deleteGroup.php",
             data: { groupid },
-            success: function(data) {
+            success: function (data) {
               if (data.indexOf("ERROR -") != -1) {
                 $(".leftSidebar").append($(data));
               } else {
                 window.location.href = "myGroups.php";
               }
             },
-            error: function() {
+            error: function () {
               alert("Delete failed");
-            }
+            },
           });
         }
       }
@@ -578,7 +522,7 @@ $(function() {
   const inviteButton = document.getElementById("inviteButton");
   if (inviteButton) {
     //Invite others to group, host only
-    inviteButton.addEventListener("click", function() {
+    inviteButton.addEventListener("click", function () {
       const emails = $("#inviteArea").val(),
         message = $("#message").val(),
         groupid = $(inviteButton).data("groupid"),
@@ -586,7 +530,7 @@ $(function() {
       $.post({
         url: "includes/sendInvites.php",
         data: { groupid, groupname, emails, message },
-        success: function(data) {
+        success: function (data) {
           if (data.indexOf("ERROR -") != -1) {
             $("#errorMessage").remove();
             $("#members").append(data.substr(7));
@@ -596,89 +540,44 @@ $(function() {
             $("#members").append('<p style="color: white;">Invites Sent.</p>');
           }
         },
-        error: function() {
+        error: function () {
           $("#members").append('<p style="color: white;">Invites failed to send.</p>');
-        }
+        },
+      });
+    });
+  }
+  function gatherSongsForPlaylist(groupId) {
+    return new Promise((resolve, reject) => {
+      $.post({
+        //Creates array of songs
+        url: "includes/createPlaylist.php",
+        data: { groupId },
+        success: function (songURIs) {
+          resolve(songURIs.split(","));
+        },
+        error: function () {
+          reject("Unable to add tracks to playlist.");
+        },
       });
     });
   }
   const playlistButton = document.getElementById("playlistButton");
   if (playlistButton) {
-    playlistButton.addEventListener("click", function() {
-      const groupid = $(playlistButton).data("groupid"),
+    playlistButton.addEventListener("click", async function () {
+      const groupId = $(playlistButton).data("groupid"),
         groupName = $(playlistButton).data("groupname"),
         playlistName = `Groupslync ${groupName} Playlist`,
         refresh_token = $.cookie("refresh_token");
-      $.ajax({
-        //Adds the songs to the Spotify playlist
-        url: "https://musicauthbackend.herokuapp.com/refresh_token",
-        data: { refresh_token },
-        success: function(tokenInfo) {
-          const access_token = "Bearer " + tokenInfo.access_token;
-          $.get({
-            //Gets user ID from spotify
-            url: "https://api.spotify.com/v1/me",
-            headers: {
-              Authorization: access_token,
-              "Content-Type": "application/json"
-            },
-            success: function(userInfo) {
-              const userId = userInfo.id;
-              $.post({
-                //Creates Spotify playlist
-                url: `https://api.spotify.com/v1/users/${userId}/playlists`,
-                data: JSON.stringify({ name: playlistName }),
-                headers: {
-                  Authorization: access_token,
-                  "Content-Type": "application/json"
-                },
-                success: function(newPlaylist) {
-                  const newPlaylistId = newPlaylist.id;
-                  $.post({
-                    //Creates array of songs
-                    url: "includes/createPlaylist.php",
-                    data: { groupid },
-                    success: function(songURIs) {
-                      const songArray = songURIs.split(",");
-                      $.post({
-                        //Adds the songs to the Spotify playlist
-                        url: `https://api.spotify.com/v1/playlists/${newPlaylistId}/tracks`,
-                        data: JSON.stringify({ uris: songArray }),
-                        headers: {
-                          Authorization: access_token,
-                          "Content-Type": "application/json"
-                        },
-                        success: function() {
-                          window.location.href = "playlist.php?id=" + newPlaylistId;
-                        },
-                        error: function() {
-                          alert("Unable to add tracks to playlist.");
-                        }
-                      });
-                    },
-                    error: function() {
-                      alert("Unable to add tracks to playlist.");
-                    }
-                  });
-                },
-                error: function() {
-                  alert("Unable to create playlist. You may need to re-authorize with Spotify.");
-                }
-              });
-            },
-            error: function() {
-              alert("Failed. You may need to re-authorize with Spotify.");
-            }
-          });
-        },
-        error: function() {
-          alert("Unable to reach Spotify. You may need to re-authorize.");
-          return "";
-        }
-      });
+      const access_token = await refreshSpotifyToken(refresh_token);
+      const userId = await getUserIdFromSpotify(access_token);
+      const [newPlaylistId, songArray] = await Promise.all([
+        createSpotifyPlaylist(userId, playlistName, access_token),
+        gatherSongsForPlaylist(groupId),
+      ]);
+      window.location.href = addSongsToPlaylist(newPlaylistId, songArray, access_token);
     });
   }
-  const Confirm = type => {
+  const Confirm = (type) => {
     let x;
     if (type === "post") {
       x = confirm("Are you sure you want to delete this post? You cannot undo this action.");
